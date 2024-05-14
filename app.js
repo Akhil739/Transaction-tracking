@@ -1,10 +1,11 @@
 const express = require('express');
-
 const app = express();
 const cors = require('cors');
 
 app.use(express.json());
 app.use(cors());
+const db = require('./server');
+
 app.post("/transactions", async (req, res) => {
     const { amount, date } = req.body;
     try{
@@ -73,6 +74,19 @@ app.post("/users/:userId/roles/:roleId", async (req, res) => {
     res.status(200).send('Role assigned to user');
 });
 
+app.post('/submit-transaction', (req, res) => {
+    const { transactionID, amount, date } = req.body;
+    
+    const sql = 'INSERT INTO transactions (transactionID, amount, date) VALUES (?, ?, ?)';
+    db.query(sql, [transactionID, amount, date], (err, result) => {
+      if (err) {
+        throw err;
+      }
+      console.log('Transaction submitted:', { transactionID, amount, date });
+      res.send('Transaction submitted successfully');
+    });
+  });
+
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke');
@@ -83,17 +97,17 @@ app.listen(8080, () => {
 });
 
 async function getTransactions() {
-    const [rows] = await pool.query("SELECT * FROM Transactions");
+    const [rows] = await db.query("SELECT * FROM Transactions");
     return rows;
   }
   
  async function getTransaction(id) {
-    const [rows] = await pool.query("SELECT * FROM Transactions WHERE transaction_id = ?", [id]);
+    const [rows] = await db.query("SELECT * FROM Transactions WHERE transaction_id = ?", [id]);
     return rows[0];
   }
   
   async function createTransaction(amount, date) {
-    const [result] = await pool.query("INSERT INTO Transactions (amount, date) VALUES (?, ?)", [amount, date]);
+    const [result] = await db.query("INSERT INTO Transactions (amount, date) VALUES (?, ?)", [amount, date]);
     const id = result.insertId;
     return getTransaction(id);
   }
