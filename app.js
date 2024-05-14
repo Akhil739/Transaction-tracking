@@ -1,14 +1,22 @@
 const express = require('express');
-const { getNotes, getNote, createNote, createUser, getUser, createCategory, getCategory, createRole, getRole, assignCategoryToTransaction, assignRoleToUser } = require('./database');
 
 const app = express();
+const cors = require('cors');
 
 app.use(express.json());
-
+app.use(cors());
 app.post("/transactions", async (req, res) => {
     const { amount, date } = req.body;
-    const transaction = await createTransaction(amount, date);
-    res.status(201).send(transaction);
+    try{
+        const transaction = await createTransaction(amount, date);
+        res.status(201).send(transaction);
+    }catch(err){
+        console.log(err)
+    }
+   
+    res.json({
+        msg:"hello"
+    })
 });
 
 app.get("/transactions/:id", async (req, res) => {
@@ -73,3 +81,19 @@ app.use((err, req, res, next) => {
 app.listen(8080, () => {
     console.log('Server is running on port 8080');
 });
+
+async function getTransactions() {
+    const [rows] = await pool.query("SELECT * FROM Transactions");
+    return rows;
+  }
+  
+ async function getTransaction(id) {
+    const [rows] = await pool.query("SELECT * FROM Transactions WHERE transaction_id = ?", [id]);
+    return rows[0];
+  }
+  
+  async function createTransaction(amount, date) {
+    const [result] = await pool.query("INSERT INTO Transactions (amount, date) VALUES (?, ?)", [amount, date]);
+    const id = result.insertId;
+    return getTransaction(id);
+  }
