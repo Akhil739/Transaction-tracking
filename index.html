@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Tracking</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+        <h1>Transaction Tracking System</h1>
+    </header>
+    <main>
+        <section class="form-section">
+            <!-- Transaction tracking form -->
+            <form id="transactionForm">
+                <div class="form-group">
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" name="amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <button type="submit">Track Transaction</button>
+            </form>
+        </section>
+
+        <section class="form-section">
+            <!-- User creation form -->
+            <form id="userForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Create User</button>
+            </form>
+        </section>
+
+        <section class="form-section">
+            <!-- Category creation form -->
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label for="category_name">Category Name:</label>
+                    <input type="text" id="category_name" name="category_name" required>
+                </div>
+                <button type="submit">Create Category</button>
+            </form>
+        </section>
+
+        <section class="form-section">
+            <!-- Role creation form -->
+            <form id="roleForm">
+                <div class="form-group">
+                    <label for="role_name">Role Name:</label>
+                    <input type="text" id="role_name" name="role_name" required>
+                </div>
+                <button type="submit">Create Role</button>
+            </form>
+        </section>
+
+        <section class="form-section">
+            <!-- Assign category to transaction form -->
+            <form id="assignCategoryForm">
+                <div class="form-group">
+                    <label for="transaction_id">Transaction ID:</label>
+                    <input type="number" id="transaction_id" name="transaction_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="category_id">Category ID:</label>
+                    <input type="number" id="category_id" name="category_id" required>
+                </div>
+                <button type="submit">Assign Category</button>
+            </form>
+        </section>
+
+        <section class="form-section">
+            <!-- Assign role to user form -->
+            <form id="assignRoleForm">
+                <div class="form-group">
+                    <label for="user_id">User ID:</label>
+                    <input type="number" id="user_id" name="user_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="role_id">Role ID:</label>
+                    <input type="number" id="role_id" name="role_id" required>
+                </div>
+                <button type="submit">Assign Role</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Transaction Tracker</p>
+        <ul class="social-media">
+            <li><a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a href="#" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
+        </ul>
+    </footer>
+    <script>
+        async function submitForm(url, data) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            return response.json();
+        }
+
+        document.getElementById('transactionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const amount = document.getElementById('amount').value;
+            const date = document.getElementById('date').value;
+            const data = await submitForm('http://localhost:8080/transactions', { amount, date });
+            console.log('Transaction created:', data);
+        });
+
+        document.getElementById('userForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const data = await submitForm('http://localhost:8080/users', { username, email, password });
+            console.log('User created:', data);
+        });
+
+        document.getElementById('categoryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const category_name = document.getElementById('category_name').value;
+            const data = await submitForm('http://localhost:8080/categories', { category_name });
+            console.log('Category created:', data);
+        });
+
+        document.getElementById('roleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const role_name = document.getElementById('role_name').value;
+            const data = await submitForm('http://localhost:8080/roles', { role_name });
+            console.log('Role created:', data);
+        });
+
+        document.getElementById('assignCategoryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const transaction_id = document.getElementById('transaction_id').value;
+            const category_id = document.getElementById('category_id').value;
+            const data = await submitForm(`http://localhost:8080/transactions/${transaction_id}/categories/${category_id}`, {});
+            console.log('Category assigned to transaction:', data);
+        });
+
+        document.getElementById('assignRoleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const user_id = document.getElementById('user_id').value;
+            const role_id = document.getElementById('role_id').value;
+            const data = await submitForm(`http://localhost:8080/users/${user_id}/roles/${role_id}`, {});
+            console.log('Role assigned to user:', data);
+        });
+    </script>
+</body>
+</html>
